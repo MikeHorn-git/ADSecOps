@@ -1,7 +1,7 @@
 #! /bin/bash
 
 echo "[+] Install dependencies packages"
-sudo pacman -S virtualbox ansible vagrant python-pywinrm
+sudo pacman -Syy virtualbox ansible vagrant python-pywinrm
 
 echo "[+] Install Vagrant plugins"
 VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install winrm
