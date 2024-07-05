@@ -6,10 +6,12 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.cpus = 2
     vb.memory = "4096"
+    vb.name = "ADSecOps"
   end
 
-  # Provisionner la machine avec Ansible
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "playbook.yml"
+    ansible.playbook = "setup.yml"
+    ansible.compatibility_mode = "2.0"
+    ansible.inventory_path = "inventory.yml"
   end
 end

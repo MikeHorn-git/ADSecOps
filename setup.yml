@@ -1,0 +1,34 @@
+- name: Setup ADSSecOps
+  hosts: all
+  tasks:
+    - name: Run prerequisites
+      ansible.windows.win_powershell:
+        script: |
+          Add-WindowsFeature AD-Domain-Services
+          Set-TimeZone -Name "Romance Standard Time"
+
+    - name: Change keyboard layout to French (AZERTY)
+      ansible.windows.win_powershell:
+        script: |
+          Set-WinUserLanguageList -LanguageList fr-FR
+          Set-WinUILanguageOverride -Language fr-FR
+          Set-WinDefaultInputMethodOverride -InputTip "040c:0000040c"
+
+    - name: Change the hostname
+      ansible.windows.win_hostname:
+        name: dc
+      register: hostname_change
+
+    - name: Reboot after hostname modification
+      ansible.windows.win_reboot:
+      when: hostname_change.reboot_required
+
+    - name: Install ADDS role and configure it with minimal options
+      ansible.windows.win_domain:
+        dns_domain_name: bzh.local
+        safe_mode_password: password123!
+      register: domain_install
+
+    - name: Reboot after AD promotion
+      ansible.windows.win_reboot:
+      when: domain_install.reboot_required

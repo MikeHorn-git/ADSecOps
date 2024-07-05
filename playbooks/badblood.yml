@@ -1,0 +1,19 @@
+- name: Setup BadBlood
+  hosts: all
+  tasks:
+    - name: Download BadBlood
+      ansible.windows.win_get_url:
+        url: "https://github.com/davidprowe/BadBlood/archive/master.zip"
+        dest: "C:\\BadBlood.zip"
+
+    - name: Unzip BadBlood
+      community.windows.win_unzip:
+        src: "C:\\BadBlood.zip"
+        dest: "C:\\BadBlood"
+        creates: "C:\\BadBlood\\BadBlood-master"
+
+    - name: Execute BadBlood
+      ansible.windows.win_powershell:
+        script: |
+          Set-Location "C:\\BadBlood\\BadBlood-master"
+          .\\Invoke-BadBlood.ps1
