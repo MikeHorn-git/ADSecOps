@@ -1,18 +1,25 @@
-- name: Setup ADSSecOps
+- name: Setup ADSecOps
   hosts: all
   tasks:
-    - name: Run prerequisites
+    - name: Add AD Windows feature
       ansible.windows.win_powershell:
         script: |
           Add-WindowsFeature AD-Domain-Services
-          Set-TimeZone -Name "Romance Standard Time"
 
-    - name: Change keyboard layout to French (AZERTY)
-      ansible.windows.win_powershell:
-        script: |
-          Set-WinUserLanguageList -LanguageList fr-FR
-          Set-WinUILanguageOverride -Language fr-FR
-          Set-WinDefaultInputMethodOverride -InputTip "040c:0000040c"
+    - name: Set timezone to 'Romance Standard Time' (GMT+01:00)
+      community.windows.win_timezone:
+        timezone: Romance Standard Time
+
+    - name: Change system locale to France
+      community.windows.win_region:
+        location: "84"
+        format: fr-FR
+        unicode_language: fr-FR
+      register: locale_change
+
+    - name: Reboot after system locale modification
+      ansible.windows.win_reboot:
+      when: locale_change.restart_required
 
     - name: Change the hostname
       ansible.windows.win_hostname:
@@ -24,8 +31,8 @@
       when: hostname_change.reboot_required
 
     - name: Install ADDS role and configure it with minimal options
-      ansible.windows.win_domain:
-        dns_domain_name: bzh.local
+      microsoft.ad.domain:
+        dns_domain_name: adsecops.local
         safe_mode_password: password123!
       register: domain_install
 

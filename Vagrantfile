@@ -7,10 +7,11 @@ Vagrant.configure("2") do |config|
     vb.cpus = 2
     vb.memory = "4096"
     vb.name = "ADSecOps"
+    vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
   end
 
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "setup.yml"
+    ansible.playbook = "playbooks/deploy/setup.yml"
     ansible.compatibility_mode = "2.0"
     ansible.inventory_path = "inventory.yml"
   end

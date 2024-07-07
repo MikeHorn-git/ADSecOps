@@ -4,6 +4,7 @@ echo "[+] Install dependencies packages"
 sudo pacman -Syy virtualbox ansible vagrant python-pywinrm
 
 echo "[+] Install Vagrant plugins"
+VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-vbguest
 VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install winrm
 VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install winrm-elevated
 VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install winrm-fs
