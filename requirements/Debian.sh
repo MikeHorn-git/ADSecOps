@@ -1,7 +1,7 @@
 #! /bin/bash
 
 echo "[+] Install dependencies packages"
-sudo apt update; sudo apt install virtualbox ansible vagrant python3-winrm -y
+sudo apt update; sudo apt install ansible make python3-winrm vagrant virtualbox -y
 
 echo "[+] Install Vagrant plugins"
 vagrant plugin install vagrant-vbguest
