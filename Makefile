@@ -1,5 +1,6 @@
 VAGRANT = vagrant
 ANSIBLE_PLAYBOOK = ansible-playbook
+INVENTORY = inventory.yml
 PLAYBOOK_DIR = playbooks
 SCRIPTS_DIR = scripts
 
@@ -18,16 +19,16 @@ help:
 
 setup:
 	$(VAGRANT) up
-	$(ANSIBLE_PLAYBOOK) -i inventory.yml $(PLAYBOOK_DIR)/deploy/badblood.yml
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $(PLAYBOOK_DIR)/deploy/badblood.yml
 
 red:
-	cd $(PLAYBOOK_DIR)/red && $(ANSIBLE_PLAYBOOK) disable_kerberos_preauth.yml
+	cd $(PLAYBOOK_DIR)/red && $(ANSIBLE_PLAYBOOK) -i ../../$(INVENTORY) disable_kerberos_preauth.yml
 
 blue:
-	cd $(PLAYBOOK_DIR)/blue && $(ANSIBLE_PLAYBOOK) enable_kerberos_preauth.yml
+	cd $(PLAYBOOK_DIR)/blue && $(ANSIBLE_PLAYBOOK) -i ../../$(INVENTORY) enable_kerberos_preauth.yml
 
 miscs:
-	cd $(PLAYBOOK_DIR)/miscs && $(ANSIBLE_PLAYBOOK) pingcastle.yml
+	cd $(PLAYBOOK_DIR)/miscs && $(ANSIBLE_PLAYBOOK) -i ../../$(INVENTORY) pingcastle.yml
 
 all: red miscs blue
 
