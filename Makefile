@@ -6,33 +6,42 @@ SCRIPTS_DIR = scripts
 
 .DEFAULT_GOAL := setup
 
-# Help target
 help:
 	@echo "Usage: make <target>"
 	@echo "Targets:"
 	@echo "  setup         Deploy Vagrant and run badblood playbook"
-	@echo "  red           Deploy red theme playbook"
-	@echo "  blue          Deploy blue theme playbook"
-	@echo "  miscs         Deploy miscs playbook"
+	@echo "  red           Deploy red theme playbooks"
+	@echo "  blue          Deploy blue theme playbooks"
+	@echo "  miscs         Deploy miscs playbooks"
 	@echo "  all           Deploy all playbooks"
 	@echo "  clean         Destroy Vagrant VM"
+	@echo "  prune         Prune invalid entries"
 
 setup:
 	$(VAGRANT) up
 	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $(PLAYBOOK_DIR)/deploy/badblood.yml
 
 red:
-	cd $(PLAYBOOK_DIR)/red && $(ANSIBLE_PLAYBOOK) -i ../../$(INVENTORY) disable_kerberos_preauth.yml
+	for playbook in $(PLAYBOOK_DIR)/red/*.yml; do \
+		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
+	done
 
 blue:
-	cd $(PLAYBOOK_DIR)/blue && $(ANSIBLE_PLAYBOOK) -i ../../$(INVENTORY) enable_kerberos_preauth.yml
+	for playbook in $(PLAYBOOK_DIR)/blue/*.yml; do \
+		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
+	done
 
 miscs:
-	cd $(PLAYBOOK_DIR)/miscs && $(ANSIBLE_PLAYBOOK) -i ../../$(INVENTORY) pingcastle.yml
+	for playbook in $(PLAYBOOK_DIR)/miscs/*.yml; do \
+		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
+	done
 
 all: red miscs blue
 
 clean:
 	$(VAGRANT) destroy -f
 
-.PHONY: help setup red blue miscs all clean
+prune:
+	$(VAGRANT) global-status --prune
+
+.PHONY: help setup red blue miscs all clean distclean

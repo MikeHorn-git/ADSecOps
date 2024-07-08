@@ -1,5 +1,4 @@
-- name: Setup PingCastle
-  hosts: all
+- hosts: all
   tasks:
     - name: Execute pingcastle.ps1
       ansible.windows.win_shell: |

@@ -1,6 +1,5 @@
-- name: Disable Kerberos pre-authentication for Administrators group members
-  hosts: all
+- hosts: all
   tasks:
-    - name: Execute disable_kerberos_preauth.ps1
+    - name: Execute vuln_permissions_gpo_priv.ps1
       ansible.windows.win_shell: |
         powershell.exe -ExecutionPolicy Bypass -File C:\vagrant\scripts\red\vuln_permissions_gpo_priv.ps1

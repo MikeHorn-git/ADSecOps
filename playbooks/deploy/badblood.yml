@@ -1,5 +1,4 @@
-- name: Setup BadBlood
-  hosts: all
+- hosts: all
   tasks:
     - name: Execute badblood.ps1
       ansible.windows.win_shell: |
