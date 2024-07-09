@@ -10,9 +10,10 @@ help:
 	@echo "Usage: make <target>"
 	@echo "Targets:"
 	@echo "  setup         Deploy Vagrant and run badblood playbook"
+	@echo "  install       Install scans tools"
 	@echo "  red           Deploy red theme playbooks"
 	@echo "  blue          Deploy blue theme playbooks"
-	@echo "  miscs         Deploy miscs playbooks"
+	@echo "  scans         Deploy scans playbooks"
 	@echo "  all           Deploy all playbooks"
 	@echo "  clean         Destroy Vagrant VM"
 	@echo "  prune         Prune invalid entries"
@@ -20,6 +21,10 @@ help:
 setup:
 	$(VAGRANT) up
 	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $(PLAYBOOK_DIR)/deploy/badblood.yml
+
+install:
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $(PLAYBOOK_DIR)/deploy/adrecon.yml
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $(PLAYBOOK_DIR)/deploy/pingcastle.yml
 
 red:
 	for playbook in $(PLAYBOOK_DIR)/red/*.yml; do \
@@ -31,8 +36,8 @@ blue:
 		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
 	done
 
-miscs:
-	for playbook in $(PLAYBOOK_DIR)/miscs/*.yml; do \
+scans:
+	for playbook in $(PLAYBOOK_DIR)/scans/*.yml; do \
 		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
 	done
 

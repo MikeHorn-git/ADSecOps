@@ -1,5 +1,0 @@
-- hosts: all
-  tasks:
-    - name: Execute pingcastle.ps1
-      ansible.windows.win_shell: |
-        powershell.exe -ExecutionPolicy Bypass -File C:\vagrant\scripts\miscs\pingcastle.ps1
