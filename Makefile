@@ -1,4 +1,5 @@
 VAGRANT = vagrant
+LATEX = pdflatex
 ANSIBLE_PLAYBOOK = ansible-playbook
 INVENTORY = inventory.yml
 PLAYBOOK_DIR = playbooks
@@ -17,6 +18,7 @@ help:
 	@echo "  all           Deploy all playbooks"
 	@echo "  clean         Destroy Vagrant VM"
 	@echo "  prune         Prune invalid entries"
+	@echo "  report        Create report in pdf format"
 
 setup:
 	$(VAGRANT) up
@@ -49,4 +51,7 @@ clean:
 prune:
 	$(VAGRANT) global-status --prune
 
-.PHONY: help setup red blue miscs all clean distclean
+report:
+	$(LATEX) report/report.tex
+
+.PHONY: help setup install red blue scans all clean prune report

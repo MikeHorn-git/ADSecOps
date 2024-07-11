@@ -1,13 +1,13 @@
-$badBloodZipPath = "C:\BadBlood.zip"
-$badBloodExtractPath = "C:\BadBlood"
-$badBloodMasterPath = "C:\BadBlood\BadBlood-master"
+$ZipPath = "C:\BadBlood.zip"
+$ExtractPath = "C:\BadBlood"
+$MasterPath = "C:\BadBlood\BadBlood-master"
 
-Invoke-WebRequest -Uri "https://github.com/davidprowe/BadBlood/archive/master.zip" -OutFile $badBloodZipPath
+Invoke-WebRequest -Uri "https://github.com/davidprowe/BadBlood/archive/master.zip" -OutFile $ZipPath
 
-Add-Type -AssemblyName System.IO.Compression.FileSystem -Verbose
-[System.IO.Compression.ZipFile]::ExtractToDirectory($badBloodZipPath, $badBloodExtractPath)
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::ExtractToDirectory($ZipPath, $ExtractPath)
 
-Remove-Item -Path $badBloodZipPath -Force -Verbose
+Remove-Item -Path $ZipPath -Force
 
-Set-Location $badBloodMasterPath -Verbose
+Set-Location $MasterPath
 .\Invoke-BadBlood.ps1 -NonInteractive

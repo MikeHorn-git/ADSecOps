@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+ \usepackage{graphicx}
+ \usepackage{titling}
+ \usepackage{hyperref}
+
+ \title{BlueTeam / RedTeam Active Directory
+}
+\date{2024}
+ 
+ \usepackage{fancyhdr}
+\fancypagestyle{plain}{%  the preset of fancyhdr 
+    \fancyhf{} % clear all header and footer fields
+    \fancyfoot[R]{\includegraphics[width=2cm]{KULEUVEN_GENT_RGB_LOGO.png}}
+    \fancyfoot[L]{\thedate}
+    \fancyhead[L]{Ecole 2600}
+    \fancyhead[R]{\href {https://github.com/MikeHorn-git/ADSecOps}{Github}}
+}
+\makeatletter
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip 1em%
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \@title \par}%
+    \vskip 1em%
+    %{\large \@date}%
+  \end{center}%
+  \par
+  \vskip 1em}
+\makeatother
+
+\usepackage{lipsum}  
+\usepackage{cmbright}
+
+\begin{document}
+
+\maketitle
+
+\noindent\begin{tabular}{@{}ll}
+    Students & Itayon, MikeHorn
+\end{tabular}
+
+\section*{Contexte}
+Ce \href {https://github.com/MikeHorn-git/ADSecOps}{projet} est construit via Vagrant, Ansible et des scripts en powershell. Cela permet une automatisation, de la reproductibilité  et de la scalabilité.
+
+\section*{Présentation}
+
+
+\section*{Vulnérabilité}
+
+\end{document}
