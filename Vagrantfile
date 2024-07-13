@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "playbooks/deploy/setup.yml"
+    ansible.playbook = "playbooks/setup/setup.yml"
     ansible.compatibility_mode = "2.0"
     ansible.inventory_path = "inventory.yml"
   end

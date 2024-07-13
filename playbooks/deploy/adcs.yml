@@ -3,11 +3,9 @@
     - name: Execute adcs_requirements.ps1
       ansible.windows.win_shell: |
         powershell.exe -ExecutionPolicy Bypass -File C:\vagrant\scripts\deploy\adcs_requirements.ps1
-      register: adcs_requirements
 
-    - name: Reboot after system locale modification
+    - name: Reboot after executing adcs_requirements.ps1
       ansible.windows.win_reboot:
-      when: adcs_requirements.restart_required
 
     - name: Execute adcs_install.ps1
       ansible.windows.win_shell: |
