@@ -17,15 +17,18 @@ if (-not $template) {
     exit
 }
 
-# Disable manager approval (ESC1) if it's enabled
-if ($template.PSObject.Properties.Match("RequiresManagerApproval")) {
-    if ($template.RequiresManagerApproval) {
-        $template.RequiresManagerApproval = $false
-        Set-CATemplate -InputObject $template
-        Write-Host "RequiresManagerApproval has been set to false."
-    } else {
-        Write-Host "RequiresManagerApproval is already false. No changes needed."
-    }
-} else {
+# Check if the template has the RequiresManagerApproval property
+$property = $template | Get-Member -Name "RequiresManagerApproval"
+if (-not $property) {
     Write-Error "RequiresManagerApproval property not found on the template."
+    exit
+}
+
+# Enable manager approval (ESC1) if it's disabled
+if (-not $template.RequiresManagerApproval) {
+    $template.RequiresManagerApproval = $true
+    Set-CATemplate -InputObject @($template)
+    Write-Host "RequiresManagerApproval has been set to true."
+} else {
+    Write-Host "RequiresManagerApproval is already true. No changes needed."
 }

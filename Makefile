@@ -16,9 +16,10 @@ help:
 	@echo "  blue          Deploy blue theme playbooks"
 	@echo "  scans         Deploy scans playbooks"
 	@echo "  all           Deploy all playbooks"
+	@echo "  report        Create report in pdf format"
 	@echo "  clean         Destroy Vagrant VM"
 	@echo "  prune         Prune invalid entries"
-	@echo "  report        Create report in pdf format"
+	@echo "  distclean     Execute clean and prune command"
 
 setup:
 	$(VAGRANT) up
