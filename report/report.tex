@@ -1,27 +1,29 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
- \geometry{
+\geometry{
  a4paper,
  total={170mm,257mm},
  left=20mm,
  top=20mm,
- }
- \usepackage{titling}
- \usepackage{hyperref}
-
- \title{BlueTeam / RedTeam Active Directory
 }
+\usepackage{titling}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{cmbright}
+
+\title{BlueTeam / RedTeam ADSecOps}
 \date{2024}
- 
- \usepackage{fancyhdr}
-\fancypagestyle{plain}{%  the preset of fancyhdr 
+
+\fancypagestyle{plain}{% the preset of fancyhdr 
     \fancyhf{} % clear all header and footer fields
     \fancyfoot[R]{\includegraphics[width=2cm]{KULEUVEN_GENT_RGB_LOGO.png}}
     \fancyfoot[L]{\thedate}
     \fancyhead[L]{Ecole 2600}
-    \fancyhead[R]{\href {https://github.com/MikeHorn-git/ADSecOps}{Github}}
+    \fancyhead[R]{\href{https://github.com/MikeHorn-git/ADSecOps}{Github}}
 }
+
 \makeatletter
 \def\@maketitle{%
   \newpage
@@ -31,14 +33,10 @@
   \let \footnote \thanks
     {\LARGE \@title \par}%
     \vskip 1em%
-    %{\large \@date}%
   \end{center}%
   \par
   \vskip 1em}
 \makeatother
-
-\usepackage{graphicx}
-\usepackage{cmbright}
 
 \begin{document}
 
@@ -49,49 +47,130 @@
 \end{tabular}
 
 \section*{Contexte}
-Ce \href {https://github.com/MikeHorn-git/ADSecOps}{projet} est construit via Vagrant, Ansible et des scripts en powershell. Cela permet une automatisation, de la reproductibilité, de l'uniformité et une meilleures scalabilité. Le rapport est écrit en latex et un Makefile facilite le maniement du lab.
+Ce \href{https://github.com/MikeHorn-git/ADSecOps}{projet} est construit via Vagrant, Ansible et des scripts en PowerShell. Cela permet une automatisation, de la reproductibilité, de l'uniformité et une meilleure scalabilité. Le rapport est écrit en LaTeX et un Makefile facilite le maniement du lab.
 
 \section{Présentation}
-- Nom : adsecops.local\newline
-- Nombre d'objets total : 3552\newline
-- \href {https://github.com/MikeHorn-git/ADSecOps/assets/text/objects-number.txt}{Nombre d'objets par type}\newline
-- \href{https://github.com/MikeHorn-git/ADSecOps/assets/picture/dsa.png}{screenshot} de dsa.msc\newline
-- \href{https://github.com/MikeHorn-git/ADSecOps/assets/text/get-aduser.txt}{Output} complet de l'AD via Get-ADUser
+\begin{itemize}
+    \item Nom : adsecops.local
+    \item Nombre d'objets total : 3552
+    \item \href{https://github.com/MikeHorn-git/ADSecOps/assets/text/objects-number.txt}{Nombre d'objets par type}
+    \item \href{https://github.com/MikeHorn-git/ADSecOps/assets/picture/dsa.png}{Screenshot} de dsa.msc
+    \item \href{https://github.com/MikeHorn-git/ADSecOps/assets/text/get-aduser.txt}{Output complet de l'AD via Get-ADUser}
+\end{itemize}
 
-\section{\texorpdfstring{\href{https://www.cert.ssi.gouv.fr/uploads/ad_checklist.html#vuln_adcs_template_control}{vuln\_adcs\_template\_control}}{vuln\_adcs\_template\_control}}
+\section{Déploiement Automatique}
+Le déploiement de l'environnement Active Directory est entièrement automatisé grâce à l'utilisation de Vagrant et Ansible. Le \textbf{Vagrantfile} est utilisé pour créer les machines virtuelles nécessaires à l'environnement de test. Ce fichier contient des instructions détaillées sur les spécifications de chaque machine, telles que la quantité de mémoire, le nombre de processeurs, et les configurations réseau. Par exemple, une machine virtuelle peut être configurée pour agir en tant que contrôleur de domaine, tandis qu'une autre peut être configurée pour simuler un client de réseau.
 
-\subsection{Description}
-Il existe plusieurs vulnérabilités ESC. Nous évoquerons la \href{https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/ad-certificates/domain-escalation}{ESC4}, qui se focalise sur les permissions des templates :\newline
-- Owner : Accorde un contrôle implicite sur l'objet, permettant la modification de tous les attributs.\newline
-- Full control : Offre une autorité complète sur l'objet, y compris la capacité de modifier tous les attributs.\newline
-- WriteOwner : Permet de changer le propriétaire de l'objet pour un principal sous le contrôle de l'attaquant.\newline
-- WriteDacl : Permet l'ajustement des contrôles d'accès, pouvant potentiellement accorder à un attaquant un contrôle total.\newline
-- WritePropriété : Autorise la modification de toutes les propriétés de l'objet.\newline
+Une fois les machines virtuelles créées, le playbook \textbf{setup.yml} prend le relais. Ce fichier Ansible contient des instructions pour installer les logiciels requis, configurer les services et appliquer les paramètres de sécurité de base. Les tâches incluent l'installation de rôles Windows spécifiques, la configuration de paramètres réseau, et la mise en place de scripts de démarrage pour garantir que les services essentiels sont actifs.
 
-Puis la href{https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/ad-certificates/domain-escalation}{ESC1} dans un second temps :\newline
-- Les droits d'inscription sont accordés aux utilisateurs à faible privilège par l'Autorité de Certification d'Entreprise.
-- L'approbation du manager n'est pas requise.
-- Aucune signature de personnel autorisé n'est nécessaire.
-- Les descripteurs de sécurité sur les modèles de certificats sont trop permissifs, permettant aux utilisateurs à faible privilège d'obtenir des droits d'inscription.
-- Les modèles de certificats sont configurés pour définir des utilisations étendues de clés (EKU) qui facilitent l'authentification :
-- La possibilité pour les demandeurs d'inclure un subjectAltName dans la demande de signature de certificat (CSR) est autorisée par le modèle :
+\section{Alimentation Automatique de l'AD}
+L'alimentation de l'Active Directory est automatisée via l'outil \textbf{BadBlood}. BadBlood est utilisé pour peupler l'AD avec une grande quantité d'objets et de relations afin de simuler un environnement réel et complexe. Cela inclut la création d'utilisateurs, de groupes, de machines, et de relations de groupe. Par exemple, des comptes utilisateurs avec divers niveaux de privilèges sont créés, des groupes de sécurité sont définis, et des machines virtuelles sont ajoutées à l'AD.
 
-\subsection{Reproduction}
-Pour ce faire 
+Ce processus est essentiel pour tester les mesures de sécurité dans un environnement réaliste. Les tests de sécurité, comme les audits de permission et les simulations d'attaques, nécessitent un environnement riche en données pour être pertinents. BadBlood permet d'automatiser ce processus, garantissant que l'environnement de test est toujours prêt pour des évaluations de sécurité approfondies.
 
-\subsection{Exploitation}
-Nous allons utiliser \href{https://github.com/ly4k/Certipy}{certipy}, ainsi que ce \href{https://www.beyondtrust.com/blog/entry/esc4-attacks}{blog}:\newline
-- Un premier \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/text/certipy_recon.txt}{scan} global via "certipy find -vulnerable -dc-ip '192.168.1.111' -u 'vagrant' -p 'vagrant' -stdout -debug" nous confirme bien la présence de la vulnérabilité ESC4.\newline
-- Nous allons exploiter la template \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/text/certipy_webserver.txt}{WebServer} possedé par Entreprise Admin.\newline Pour ce faire, "certipy template -template WebServer -dc-ip '192.168.4.137' -u 'vagrant' -p 'vagrant' -debug", voici le \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certipy_vuln.png}{résultat}\newline
-- Pour confirmer cette dernière commande, nous allons de nouveau lancer certipy en mode find. Ce \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certipy_confirm.png}{screenshot} confirme bien qu'il existe de nouvelles vulnérabilités (ESC1,ESC2,ESC3)\newline
-- Ici l'exploitation de la vulnérabilité ESC4 avec certipy a permit de donner des droits d'inscriptions (Enrolment rights), qui se trouve être une des caractéristiques de la ESC1. Via cette commande nous allons donc exploiter cette dernière nouvellement crée : "certipy req -upn AuthenticatedUsers -ca adsecops-DC-CA -template WebServer -dc-ip '192.168.4.137' -u 'vagrant' -p 'vagrant' -debug". Voici le \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certipy_ESC1.png}{résultat}. Cette \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certsrv_req.png}{capture d'écran} confirme la création du certificat.
+\section{Installation et Exécution de PingCastle}
+\textbf{PingCastle} est un outil utilisé pour analyser la sécurité de l'Active Directory. L'installation et l'exécution de PingCastle sont automatisées via des scripts PowerShell. PingCastle effectue une série de vérifications de sécurité, y compris la détection de configurations faibles, la vérification des permissions, et l'identification des vulnérabilités potentielles.
 
-\subsection{Detection}
-En utilisant pingcastle l'on obtient ce \href{https://github.com/MikeHorn-git/ADSecOps/assets/objects-number.txt}{résultat}.\newline
-Voici la section Certificate Template delegations en \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/pingcastle_acds.png}{photos}
+Par exemple, PingCastle peut détecter des comptes utilisateurs avec des mots de passe faibles ou des permissions excessives, des machines qui ne sont pas à jour avec les derniers correctifs de sécurité, et des configurations réseau qui exposent l'AD à des attaques. Les résultats de PingCastle sont ensuite utilisés pour informer les équipes BlueTeam et RedTeam des zones à risque et des priorités de correction.
 
-\subsection{Correction}
-- Pour la ESC1 nous allons modifier les autorisations via certtmpl.msc, en atrribuant uniquement la permission read comme illustré \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certtmpl_ESC1.png}{ici}.\newline
-- Pour la ESC4 nous allons 
+\section{Vulnérabilités et Corrections}
+
+\subsection{vuln\_kerberos\_properties\_preauth\_priv}
+
+\subsubsection{Description}
+La pré-authentification Kerberos est une fonctionnalité de sécurité qui empêche les attaquants de récupérer des informations sensibles sur les utilisateurs via des attaques de pré-authentification. Si cette fonctionnalité est désactivée, un attaquant peut tenter de récupérer le hash du mot de passe de l'utilisateur et le craquer hors ligne.
+
+\subsubsection{Scénario d'attaque}
+Un attaquant avec un accès au réseau peut envoyer des requêtes de pré-authentification à un contrôleur de domaine Active Directory. Sans la pré-authentification activée, l'attaquant peut obtenir un TGT (Ticket Granting Ticket) contenant le hash du mot de passe de l'utilisateur, qu'il peut ensuite tenter de craquer hors ligne pour obtenir le mot de passe en clair.
+
+\subsubsection{Reproduction}
+Pour désactiver la pré-authentification Kerberos sur un compte utilisateur, utilisez des outils comme PowerShell pour configurer les paramètres de l'utilisateur.
+
+\subsubsection{Exploitation}
+Utilisez des outils comme Impacket pour obtenir le TGT sans pré-authentification, ce qui permet de récupérer le hash du mot de passe et de le craquer hors ligne.
+
+\subsubsection{Détection}
+Utilisez PingCastle pour détecter les comptes sans pré-authentification Kerberos activée. Cet outil permet de scanner et d'identifier les vulnérabilités liées aux configurations Kerberos.
+
+\subsubsection{Correction}
+Réactiver la pré-authentification Kerberos sur tous les comptes utilisateurs en ajustant les paramètres de sécurité de l'Active Directory pour s'assurer que tous les comptes nécessitent une pré-authentification.
+
+\subsection{vuln\_permissions\_gpo\_priv}
+
+\subsubsection{Description}
+Les objets de stratégie de groupe (GPO) peuvent être utilisés pour configurer de manière centralisée les paramètres de sécurité sur tous les ordinateurs d'un domaine. Si les permissions sur ces GPO ne sont pas correctement configurées, un attaquant avec des privilèges limités pourrait modifier les GPO pour élever ses privilèges ou désactiver des mesures de sécurité.
+
+\subsubsection{Scénario d'attaque}
+Un utilisateur malveillant avec des privilèges d'utilisateur standard peut obtenir un accès en écriture sur un GPO. L'attaquant peut alors modifier ce GPO pour désactiver les paramètres de sécurité ou ajouter un script de démarrage malveillant qui s'exécute avec des privilèges élevés sur les ordinateurs de domaine.
+
+\subsubsection{Reproduction}
+Pour accorder des permissions d'écriture à un utilisateur sur un GPO, utilisez des outils comme PowerShell pour configurer les permissions des GPO.
+
+\subsubsection{Exploitation}
+Modifier un GPO pour ajouter un script de démarrage malveillant qui s'exécute avec des privilèges élevés, permettant à l'attaquant de compromettre davantage le système.
+
+\subsubsection{Détection}
+Utilisez BloodHound pour identifier les GPO avec des permissions d'écriture non sécurisées. BloodHound peut cartographier les permissions et identifier les points faibles dans les configurations de GPO.
+
+\subsubsection{Correction}
+Restreindre les permissions sur tous les GPO pour s'assurer que seuls les administrateurs peuvent les modifier. Ajustez les paramètres de sécurité pour limiter les accès aux GPO critiques.
+
+\subsection{vuln\_adcs\_template\_control}
+
+\subsubsection{Description}
+Il existe plusieurs vulnérabilités ESC. Nous évoquerons la \href{https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/ad-certificates/domain-escalation}{ESC4}, qui se focalise sur les permissions des templates :
+\begin{itemize}
+    \item Owner : Accorde un contrôle implicite sur l'objet, permettant la modification de tous les attributs.
+    \item Full control : Offre une autorité complète sur l'objet, y compris la capacité de modifier tous les attributs.
+    \item WriteOwner : Permet de changer le propriétaire de l'objet pour un principal sous le contrôle de l'attaquant.
+    \item WriteDacl : Permet l'ajustement des contrôles d'accès, pouvant potentiellement accorder à un attaquant un contrôle total.
+    \item WritePropriété : Autorise la modification de toutes les propriétés de l'objet.
+\end{itemize}
+
+Puis la \href{https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/ad-certificates/domain-escalation}{ESC1} dans un second temps :
+\begin{itemize}
+    \item Les droits d'inscription sont accordés aux utilisateurs à faible privilège par l'Autorité de Certification d'Entreprise.
+    \item L'approbation du manager n'est pas requise.
+    \item Aucune signature de personnel autorisé n'est nécessaire.
+    \item Les descripteurs de sécurité sur les modèles de certificats sont trop permissifs, permettant aux utilisateurs à faible privilège d'obtenir des droits d'inscription.
+    \item Les modèles de certificats sont configurés pour définir des utilisations étendues de clés (EKU) qui facilitent l'authentification.
+    \item La possibilité pour les demandeurs d'inclure un subjectAltName dans la demande de signature de certificat (CSR) est autorisée par le modèle.
+\end{itemize}
+
+\subsubsection{Reproduction}
+Pour reproduire la vulnérabilité ESC4, utilisez des outils pour modifier les permissions des templates dans Active Directory Certificate Services (ADCS).
+
+\subsubsection{Exploitation}
+Nous allons utiliser \href{https://github.com/ly4k/Certipy}{Certipy} pour exploiter les vulnérabilités, ainsi que ce \href{https://www.beyondtrust.com/blog/entry/esc4-attacks}{blog} pour référence :
+\begin{itemize}
+    \item Un premier \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/text/certipy_recon.txt}{scan global} via Certipy nous confirme bien la présence de la vulnérabilité ESC4.
+    \item Nous allons exploiter la template \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/text/certipy_webserver.txt}{WebServer} possédée par Entreprise Admin. L'exploitation de la vulnérabilité ESC4 avec Certipy permet de donner des droits d'inscription (Enrolment rights), une des caractéristiques de la ESC1.
+    \item Pour confirmer cette commande, nous allons de nouveau lancer Certipy en mode find. Ce \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certipy_confirm.png}{screenshot} confirme bien qu'il existe de nouvelles vulnérabilités (ESC1, ESC2, ESC3).
+    \item Utilisez Certipy pour exploiter ESC1, en générant des certificats avec les nouveaux droits d'inscription obtenus.
+\end{itemize}
+
+\subsubsection{Détection}
+En utilisant PingCastle, nous obtenons ce \href{https://github.com/MikeHorn-git/ADSecOps/assets/objects-number.txt}{résultat}. Voici la section Certificate Template delegations en \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/pingcastle_acds.png}{photos}.
+
+\subsubsection{Correction}
+\begin{itemize}
+    \item Pour la ESC1, nous allons modifier les autorisations via certtmpl.msc, en attribuant uniquement la permission read comme illustré \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certtmpl_ESC1.png}{ici}.
+    \item Pour la ESC4, nous allons utiliser des outils de gestion des certificats pour réinitialiser les permissions de sécurité et restreindre les droits aux seuls utilisateurs autorisés.
+\end{itemize}
+
+\section{Vulnérabilités Potentielles}
+L'environnement Active Directory est sujet à plusieurs autres vulnérabilités potentielles, notamment :
+\begin{itemize}
+    \item \textbf{Attaques par force brute sur les comptes utilisateurs} : Les mots de passe faibles ou par défaut peuvent être facilement compromis. Des politiques de complexité de mot de passe et des limites de tentatives de connexion sont mises en place pour atténuer ce risque.
+    \item \textbf{Escalade de privilèges} : Les attaquants peuvent exploiter des vulnérabilités pour obtenir des privilèges administratifs. L'application de la séparation des privilèges et la limitation des comptes administratifs sont des mesures clés pour prévenir ces attaques.
+    \item \textbf{Pass-the-Hash} : Cette attaque permet à un attaquant d'utiliser un hash d'un mot de passe pour s'authentifier. L'implémentation de l'authentification Kerberos et la désactivation des protocoles d'authentification NTLM réduisent les risques associés à ce type d'attaque.
+    \item \textbf{Kerberoasting} : Une technique où les attaquants demandent des tickets de service pour les comptes de service dans Active Directory et tentent de les déchiffrer hors ligne. La mise en place de comptes de service avec des mots de passe forts et la surveillance des requêtes Kerberos sont des stratégies efficaces pour contrer cette menace.
+    \item \textbf{Vulnérabilités non corrigées} : L'absence de mises à jour régulières peut laisser des failles exploitables. L'application des correctifs de sécurité et la mise à jour régulière des systèmes sont essentielles pour maintenir la sécurité de l'environnement.
+\end{itemize}
+
+Des mesures de sécurité comme l'application de politiques de mot de passe strictes, la mise en place de contrôles d'accès appropriés et la surveillance continue des activités réseau sont essentielles pour protéger l'environnement Active Directory contre ces menaces.
+
+\section*{Travail Futur}
+Il reste à implémenter et corriger d'autres vulnérabilités, notamment celles liées aux GPO et d'autres aspects de la sécurité AD. Le projet nécessite également des ajustements et des améliorations continues pour garantir une sécurité optimale et une flexibilité maximale. Par exemple, l'intégration de nouveaux outils de surveillance et d'audit peut renforcer la capacité de détection des menaces. De plus, des tests de pénétration réguliers et des exercices de simulation d'attaques permettront de maintenir un niveau de sécurité élevé et d'identifier rapidement les nouvelles vulnérabilités.
 
 \end{document}
