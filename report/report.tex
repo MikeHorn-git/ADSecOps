@@ -7,7 +7,6 @@
  left=20mm,
  top=20mm,
  }
- \usepackage{graphicx}
  \usepackage{titling}
  \usepackage{hyperref}
 
@@ -38,7 +37,7 @@
   \vskip 1em}
 \makeatother
 
-\usepackage{lipsum}  
+\usepackage{graphicx}
 \usepackage{cmbright}
 
 \begin{document}
@@ -50,11 +49,49 @@
 \end{tabular}
 
 \section*{Contexte}
-Ce \href {https://github.com/MikeHorn-git/ADSecOps}{projet} est construit via Vagrant, Ansible et des scripts en powershell. Cela permet une automatisation, de la reproductibilité  et de la scalabilité.
+Ce \href {https://github.com/MikeHorn-git/ADSecOps}{projet} est construit via Vagrant, Ansible et des scripts en powershell. Cela permet une automatisation, de la reproductibilité, de l'uniformité et une meilleures scalabilité. Le rapport est écrit en latex et un Makefile facilite le maniement du lab.
 
-\section*{Présentation}
+\section{Présentation}
+- Nom : adsecops.local\newline
+- Nombre d'objets total : 3552\newline
+- \href {https://github.com/MikeHorn-git/ADSecOps/assets/text/objects-number.txt}{Nombre d'objets par type}\newline
+- \href{https://github.com/MikeHorn-git/ADSecOps/assets/picture/dsa.png}{screenshot} de dsa.msc\newline
+- \href{https://github.com/MikeHorn-git/ADSecOps/assets/text/get-aduser.txt}{Output} complet de l'AD via Get-ADUser
 
+\section{\texorpdfstring{\href{https://www.cert.ssi.gouv.fr/uploads/ad_checklist.html#vuln_adcs_template_control}{vuln\_adcs\_template\_control}}{vuln\_adcs\_template\_control}}
 
-\section*{Vulnérabilité}
+\subsection{Description}
+Il existe plusieurs vulnérabilités ESC. Nous évoquerons la \href{https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/ad-certificates/domain-escalation}{ESC4}, qui se focalise sur les permissions des templates :\newline
+- Owner : Accorde un contrôle implicite sur l'objet, permettant la modification de tous les attributs.\newline
+- Full control : Offre une autorité complète sur l'objet, y compris la capacité de modifier tous les attributs.\newline
+- WriteOwner : Permet de changer le propriétaire de l'objet pour un principal sous le contrôle de l'attaquant.\newline
+- WriteDacl : Permet l'ajustement des contrôles d'accès, pouvant potentiellement accorder à un attaquant un contrôle total.\newline
+- WritePropriété : Autorise la modification de toutes les propriétés de l'objet.\newline
+
+Puis la href{https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/ad-certificates/domain-escalation}{ESC1} dans un second temps :\newline
+- Les droits d'inscription sont accordés aux utilisateurs à faible privilège par l'Autorité de Certification d'Entreprise.
+- L'approbation du manager n'est pas requise.
+- Aucune signature de personnel autorisé n'est nécessaire.
+- Les descripteurs de sécurité sur les modèles de certificats sont trop permissifs, permettant aux utilisateurs à faible privilège d'obtenir des droits d'inscription.
+- Les modèles de certificats sont configurés pour définir des utilisations étendues de clés (EKU) qui facilitent l'authentification :
+- La possibilité pour les demandeurs d'inclure un subjectAltName dans la demande de signature de certificat (CSR) est autorisée par le modèle :
+
+\subsection{Reproduction}
+Pour ce faire 
+
+\subsection{Exploitation}
+Nous allons utiliser \href{https://github.com/ly4k/Certipy}{certipy}, ainsi que ce \href{https://www.beyondtrust.com/blog/entry/esc4-attacks}{blog}:\newline
+- Un premier \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/text/certipy_recon.txt}{scan} global via "certipy find -vulnerable -dc-ip '192.168.1.111' -u 'vagrant' -p 'vagrant' -stdout -debug" nous confirme bien la présence de la vulnérabilité ESC4.\newline
+- Nous allons exploiter la template \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/text/certipy_webserver.txt}{WebServer} possedé par Entreprise Admin.\newline Pour ce faire, "certipy template -template WebServer -dc-ip '192.168.4.137' -u 'vagrant' -p 'vagrant' -debug", voici le \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certipy_vuln.png}{résultat}\newline
+- Pour confirmer cette dernière commande, nous allons de nouveau lancer certipy en mode find. Ce \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certipy_confirm.png}{screenshot} confirme bien qu'il existe de nouvelles vulnérabilités (ESC1,ESC2,ESC3)\newline
+- Ici l'exploitation de la vulnérabilité ESC4 avec certipy a permit de donner des droits d'inscriptions (Enrolment rights), qui se trouve être une des caractéristiques de la ESC1. Via cette commande nous allons donc exploiter cette dernière nouvellement crée : "certipy req -upn AuthenticatedUsers -ca adsecops-DC-CA -template WebServer -dc-ip '192.168.4.137' -u 'vagrant' -p 'vagrant' -debug". Voici le \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certipy_ESC1.png}{résultat}. Cette \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certsrv_req.png}{capture d'écran} confirme la création du certificat.
+
+\subsection{Detection}
+En utilisant pingcastle l'on obtient ce \href{https://github.com/MikeHorn-git/ADSecOps/assets/objects-number.txt}{résultat}.\newline
+Voici la section Certificate Template delegations en \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/pingcastle_acds.png}{photos}
+
+\subsection{Correction}
+- Pour la ESC1 nous allons modifier les autorisations via certtmpl.msc, en atrribuant uniquement la permission read comme illustré \href{https://github.com/MikeHorn-git/ADSecOps/blob/main/assets/pictures/certtmpl_ESC1.png}{ici}.\newline
+- Pour la ESC4 nous allons 
 
 \end{document}
