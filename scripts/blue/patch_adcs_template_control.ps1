@@ -28,7 +28,7 @@ if (-not $property) {
 if (-not $template.RequiresManagerApproval) {
     $template.RequiresManagerApproval = $true
     Set-CATemplate -InputObject @($template)
-    Write-Host "RequiresManagerApproval has been set to true."
+    Write-Output "RequiresManagerApproval has been set to true."
 } else {
-    Write-Host "RequiresManagerApproval is already true. No changes needed."
+    Write-Output "RequiresManagerApproval is already true. No changes needed."
 }

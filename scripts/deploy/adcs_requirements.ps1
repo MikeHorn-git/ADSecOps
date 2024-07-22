@@ -1,7 +1,6 @@
 $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 
 $userName = $currentUser.Split("\")[1]
-$domain = "adsecops.local"
 
 # https://learn.microsoft.com/en-us/windows-server/networking/core-network-guide/cncg/server-certs/install-the-certification-authority
 Add-ADGroupMember -Identity "Enterprise Admins" -Members $userName

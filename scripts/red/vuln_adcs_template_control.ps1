@@ -22,9 +22,9 @@ if ($template.PSObject.Properties.Match("RequiresManagerApproval")) {
     if ($template.RequiresManagerApproval) {
         $template.RequiresManagerApproval = $false
         Set-CATemplate -InputObject $template
-        Write-Host "RequiresManagerApproval has been set to false."
+        Write-Output "RequiresManagerApproval has been set to false."
     } else {
-        Write-Host "RequiresManagerApproval is already false. No changes needed."
+        Write-Output "RequiresManagerApproval is already false. No changes needed."
     }
 } else {
     Write-Error "RequiresManagerApproval property not found on the template."
