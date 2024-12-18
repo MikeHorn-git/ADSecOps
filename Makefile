@@ -5,11 +5,12 @@ INVENTORY = inventory.yml
 PLAYBOOK_DIR = playbooks
 SCRIPTS_DIR = scripts
 
-.DEFAULT_GOAL := setup
+.DEFAULT_GOAL := help
 
 help:
 	@echo "Usage: make <target>"
 	@echo "Targets:"
+	@echo "  help          Display this help message"
 	@echo "  setup         Deploy Vagrant and run badblood playbook"
 	@echo "  deploy        Install requirements"
 	@echo "  red           Deploy red theme playbooks"

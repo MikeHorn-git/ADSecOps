@@ -1,3 +1,2 @@
 Vagrantfile linguist-vendored=false
 Vagrantfile linguist-detectable=true
-assets/** linguist-vendored
