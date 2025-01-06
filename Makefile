@@ -1,5 +1,4 @@
 VAGRANT = vagrant
-LATEX = pdflatex
 ANSIBLE_PLAYBOOK = ansible-playbook
 INVENTORY = inventory.yml
 PLAYBOOK_DIR = playbooks
