@@ -1,4 +1,6 @@
-- hosts: all
+---
+- name: Patch_kerberos_properties_preauth_priv
+  hosts: all
   tasks:
     - name: Wait for shared folder to be available
       ansible.windows.win_stat:
