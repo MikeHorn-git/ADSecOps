@@ -1,10 +1,13 @@
-VAGRANT = vagrant
-ANSIBLE_PLAYBOOK = ansible-playbook
-INVENTORY = inventory.yml
-PLAYBOOK_DIR = playbooks
-SCRIPTS_DIR = scripts
+# Dirs
+DIR_ANSIBLE   := ansible-playbook
+DIR_INVENTORY := inventory.yml
+DIR_PLAYBOOK  := playbooks
+
+# Files
+FILE_ANSIBLE  := ./.ansible-lint
 
 .DEFAULT_GOAL := help
+.ONESHELL:
 
 help:
 	@echo "Usage: make <target>"
@@ -19,39 +22,45 @@ help:
 	@echo "  clean         Destroy Vagrant VM"
 	@echo "  prune         Prune invalid entries"
 	@echo "  distclean     Execute clean and prune command"
+	@echo "  lint          Lint Ansible, README and Vagrantfile"
 
 setup:
-	$(VAGRANT) up
-	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $(PLAYBOOK_DIR)/setup/badblood.yml
+	vagrant up
+	$(DIR_ANSIBLE) -i $(DIR_INVENTORY) $(DIR_PLAYBOOK)/setup/badblood.yml
 
 deploy:
-	for playbook in $(PLAYBOOK_DIR)/deploy/*.yml; do \
-		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
+	for playbook in $(DIR_PLAYBOOK)/deploy/*.yml; do \
+		$(DIR_ANSIBLE) -i $(DIR_INVENTORY) $$playbook; \
 	done
 
 red:
-	for playbook in $(PLAYBOOK_DIR)/red/*.yml; do \
-		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
+	for playbook in $(DIR_PLAYBOOK)/red/*.yml; do \
+		$(DIR_ANSIBLE) -i $(DIR_INVENTORY) $$playbook; \
 	done
 
 blue:
-	for playbook in $(PLAYBOOK_DIR)/blue/*.yml; do \
-		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
+	for playbook in $(DIR_PLAYBOOK)/blue/*.yml; do \
+		$(DIR_ANSIBLE) -i $(DIR_INVENTORY) $$playbook; \
 	done
 
 scans:
-	for playbook in $(PLAYBOOK_DIR)/scans/*.yml; do \
-		$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) $$playbook; \
+	for playbook in $(DIR_PLAYBOOK)/scans/*.yml; do \
+		$(DIR_ANSIBLE) -i $(DIR_INVENTORY) $$playbook; \
 	done
 
 all: red miscs blue
 
 clean:
-	$(VAGRANT) destroy -f
+	vagrant destroy -f
 
 prune:
-	$(VAGRANT) global-status --prune
+	vagrant global-status --prune
 
 distclean: clean prune
 
-.PHONY: help setup deploy red blue scans all report clean prune distclean
+lint:
+	@ansible-lint -c $(FILE_ANSIBLE) $(DIR_ANSIBLE)
+	@mdl README.md
+	@rubocop -A .
+
+.PHONY: help setup deploy red blue scans all report clean prune distclean lint

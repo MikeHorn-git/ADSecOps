@@ -39,18 +39,18 @@ make setup
 
 ```bash
 Usage: make <target>
-
 Targets:
-  setup         Deploy Vagrant and run BadBlood playbook
+  help          Display this help message
+  setup         Deploy Vagrant and run badblood playbook
   deploy        Install requirements
-  red           Deploy Red Team playbooks
-  blue          Deploy Blue Team playbooks
-  scans         Deploy scanning playbooks
+  red           Deploy red theme playbooks
+  blue          Deploy blue theme playbooks
+  scans         Deploy scans playbooks
   all           Deploy all playbooks
-  report        Create a report in PDF format
-  clean         Destroy Vagrant VMs
+  clean         Destroy Vagrant VM
   prune         Prune invalid entries
-  distclean     Execute clean and prune commands
+  distclean     Execute clean and prune command
+  lint          Lint Ansible, README and Vagrantfile
 ```
 
 ## Scenarios
